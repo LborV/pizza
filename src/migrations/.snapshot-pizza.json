@@ -1,0 +1,314 @@
+{
+  "namespaces": [],
+  "tables": [
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "price": {
+          "name": "price",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "float"
+        },
+        "is_valid": {
+          "name": "is_valid",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "true",
+          "mappedType": "boolean"
+        },
+        "c_date": {
+          "name": "c_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "m_date": {
+          "name": "m_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "ingredient",
+      "indexes": [
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "ingredient_name_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "ingredient_price_check",
+          "expression": "\"price\" >= 0",
+          "definition": "check ((\"price\" >= 0))",
+          "columnName": "price"
+        }
+      ],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "price": {
+          "name": "price",
+          "type": "float",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "float"
+        },
+        "is_valid": {
+          "name": "is_valid",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "true",
+          "mappedType": "boolean"
+        },
+        "c_date": {
+          "name": "c_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "m_date": {
+          "name": "m_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "pizza",
+      "indexes": [
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "pizza_name_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "pizza_price_check",
+          "expression": "\"price\" >= 0",
+          "definition": "check ((\"price\" >= 0))",
+          "columnName": "price"
+        }
+      ],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "pizza_id_id": {
+          "name": "pizza_id_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "ingredient_id_id": {
+          "name": "ingredient_id_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "order": {
+          "name": "order",
+          "type": "smallint",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "smallint"
+        },
+        "is_valid": {
+          "name": "is_valid",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "true",
+          "mappedType": "boolean"
+        },
+        "c_date": {
+          "name": "c_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "m_date": {
+          "name": "m_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "pizza_ingredients",
+      "indexes": [
+        {
+          "columnNames": [
+            "pizza_id_id"
+          ],
+          "composite": false,
+          "keyName": "pizza_ingredients_pizza_id_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "ingredient_id_id"
+          ],
+          "composite": false,
+          "keyName": "pizza_ingredients_ingredient_id_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "pizza_id_id",
+            "ingredient_id_id"
+          ],
+          "composite": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "pizza_ingredients_order_check",
+          "expression": "\"order\" >= 0",
+          "definition": "check ((\"order\" >= 0))",
+          "columnName": "order"
+        }
+      ],
+      "foreignKeys": {
+        "pizza_ingredients_pizza_id_id_foreign": {
+          "constraintName": "pizza_ingredients_pizza_id_id_foreign",
+          "columnNames": [
+            "pizza_id_id"
+          ],
+          "localTableName": "pizza_ingredients",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "pizza",
+          "updateRule": "cascade"
+        },
+        "pizza_ingredients_ingredient_id_id_foreign": {
+          "constraintName": "pizza_ingredients_ingredient_id_id_foreign",
+          "columnNames": [
+            "ingredient_id_id"
+          ],
+          "localTableName": "pizza_ingredients",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "ingredient",
+          "updateRule": "cascade"
+        }
+      }
+    }
+  ]
+}
