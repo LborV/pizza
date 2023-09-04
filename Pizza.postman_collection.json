@@ -138,7 +138,7 @@
 			"response": []
 		},
 		{
-			"name": "New Request",
+			"name": "Remove ingredient",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -160,6 +160,34 @@
 					"path": [
 						"pizza",
 						"removeIngredients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add ingredient after",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"pizza_id\": 3,\n    \"ingredient\": {\n        \"name\": \"tomato\",\n        \"price\": 0.5\n    },\"ingredients\": [\n        {\"name\": \"kaka2\", \"price\": 5},\n        {\"name\": \"kaka3\", \"price\": 6}\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/pizza/PutIngredientsAfter",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"pizza",
+						"PutIngredientsAfter"
 					]
 				}
 			},

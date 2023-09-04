@@ -10,7 +10,7 @@ export class IngredientService {
         private readonly em: EntityManager,
     ) {}
 
-    async createIngredient(name: string, price: number) {
+    async createIngredient(name: string, price: number): Promise<Ingredient> {
         let ingredient = await this.em.findOne(Ingredient, { name });
 
         if (ingredient) {
@@ -25,11 +25,11 @@ export class IngredientService {
         return ingredient;
     }
 
-    async getIngredient(id: number) {
+    async getIngredient(id: number): Promise<Ingredient> {
         return await this.em.findOne(Ingredient, { id });
     }
 
-    async getIngredients() {
+    async getIngredients(): Promise<Ingredient[]> {
         return await this.em.find(Ingredient, {});
     }
 }

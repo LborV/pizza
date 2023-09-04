@@ -5,6 +5,7 @@ import { IngredientService } from 'src/ingredient/ingredient.service';
 import { Pizza } from './pizza.entity';
 import { UseInterceptors } from '@nestjs/common';
 import { ClassSerializerInterceptor } from '@nestjs/common';
+import { Ingredient } from 'src/ingredient/ingredient.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('pizza')
@@ -20,12 +21,12 @@ export class PizzaController {
     }
 
     @Get(':id')
-    async getPizza(@Param('id') id: number) {
+    async getPizza(@Param('id') id: number): Promise<Pizza> {
         return await this.pizzaService.getPizza(id);
     }
 
     @Post('create')
-    async createPizza(@Body() createPizzaDto: { name: string, ingredients: { name: string, price: number }[] }) {
+    async createPizza(@Body() createPizzaDto: { name: string, ingredients: { name: string, price: number }[] }): Promise<Pizza> {
         const pizza = await this.pizzaService.createPizza(createPizzaDto.name);
         for (let ingredient of createPizzaDto.ingredients) {
             await this.pizzaService.addIngredientToPizza(pizza, await this.ingredientService.createIngredient(ingredient.name, ingredient.price));
@@ -35,12 +36,12 @@ export class PizzaController {
     }
 
     @Delete(':id')
-    async deletePizza(@Param('id') id: number) {
+    async deletePizza(@Param('id') id: number): Promise<Pizza> {
         return await this.pizzaService.deletePizza(id);
     }
 
     @Post('addIngredients')
-    async addIngredientToPizza(@Body() addIngredientToPizzaDto: { pizza_id: number, ingredients: {name: string, price: number}[] }) {
+    async addIngredientToPizza(@Body() addIngredientToPizzaDto: { pizza_id: number, ingredients: {name: string, price: number}[] }): Promise<Pizza> {
         const pizza = await this.pizzaService.getPizza(addIngredientToPizzaDto.pizza_id);
 
         for (let ingredient of addIngredientToPizzaDto.ingredients) {
@@ -51,7 +52,7 @@ export class PizzaController {
     }
 
     @Post('removeIngredients')
-    async removeIngredientFromPizza(@Body() removeIngredientFromPizzaDto: { pizza_id: number, ingredients: {name: string, price: number}[] }) {
+    async removeIngredientFromPizza(@Body() removeIngredientFromPizzaDto: { pizza_id: number, ingredients: {name: string, price: number}[] }): Promise<Pizza> {
         const pizza = await this.pizzaService.getPizza(removeIngredientFromPizzaDto.pizza_id);
 
         for (let ingredient of removeIngredientFromPizzaDto.ingredients) {
@@ -62,10 +63,26 @@ export class PizzaController {
     }
 
     @Post('PutIngredientsAfter')
-    async putIngredientAfter(putIngredientAfterDto: { pizza_id: number, ingredient: {name: string}, ingredients: {name: string, price: number}[] }) {
-        const pizza = await this.pizzaService.getPizza(putIngredientAfterDto.pizza_id);
+    async putIngredientAfter(@Body() putIngredientAfterDto: { pizza_id: number, ingredient: {name: string, price: number}, ingredients: {name: string, price: number}[] }): Promise<Pizza> {
+        const pizza: Pizza = await this.pizzaService.getPizza(putIngredientAfterDto.pizza_id);
+        const ingredient: Ingredient = await this.ingredientService.createIngredient(putIngredientAfterDto.ingredient.name, putIngredientAfterDto.ingredient.price);
 
-        // TODO
+        const ingredientsBefore: Ingredient[] = await this.pizzaService.getIngredientsBefore(pizza, ingredient);
+        const ingredientsAfter: Ingredient[] = await this.pizzaService.getIngredientsAfter(pizza, ingredient);
+        const ingredients: Ingredient[] = [];
+
+        for (let ingredient of putIngredientAfterDto.ingredients) {
+            ingredients.push(await this.ingredientService.createIngredient(ingredient.name, ingredient.price));
+        }
+
+        const newIngredients = [...ingredientsBefore, ...ingredients, ...ingredientsAfter];
+        await this.pizzaService.clearIngredients(pizza);
+        
+        for (let ingredient of newIngredients) {
+            await this.pizzaService.addIngredientToPizza(pizza, ingredient);
+        }
+
+        return await this.pizzaService.getPizza(putIngredientAfterDto.pizza_id);
     }
 
     // @UseInterceptors(ClassSerializerInterceptor)

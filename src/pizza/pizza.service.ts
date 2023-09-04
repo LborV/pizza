@@ -12,7 +12,7 @@ export class PizzaService {
         private readonly em: EntityManager,
     ) {}
 
-    async createPizza(name: string) {        
+    async createPizza(name: string): Promise<Pizza> {        
         let pizza = await this.em.findOne(Pizza, { name: name });
         
         if (pizza) {            
@@ -32,9 +32,8 @@ export class PizzaService {
         return pizza;
     }
 
-    async getPizza(id: number) {
+    async getPizza(id: number): Promise<Pizza> {
         let pizza = await this.em.findOne(Pizza, { id, is_valid: true });
-        console.log(id);
         
         pizza.Ingredients = [];
         let pizzaIngredients = await this.em.find(PizzaIngredients, { pizza_id: pizza, is_valid: true }, { orderBy: { order: 'ASC' } });        
@@ -52,7 +51,7 @@ export class PizzaService {
         return pizza;
     }
 
-    async getPizzas() {
+    async getPizzas(): Promise<Pizza[]> {
         let pizzas = await this.em.find(Pizza, {is_valid: true});
 
         for(let i = 0; i < pizzas.length; i++) {
@@ -62,7 +61,7 @@ export class PizzaService {
         return pizzas;
     }
 
-    async calcPizzaPrice(pizza: Pizza) {
+    async calcPizzaPrice(pizza: Pizza): Promise<number> {
         const pizzaIngredients = await this.em.find(PizzaIngredients, { pizza_id: pizza, is_valid: true });
         let price = 0;
 
@@ -81,21 +80,34 @@ export class PizzaService {
         return price;
     }
 
-    async deletePizza(id: number) {
+    async deleteAllIngredientsFromPizza(pizza: Pizza): Promise<PizzaIngredients[]> {
+        const pizzaIngredients = await this.em.find(PizzaIngredients, { pizza_id: pizza, is_valid: true });
+
+        for (let pizzaIngredient of pizzaIngredients) {
+            pizzaIngredient.is_valid = false;
+        }
+
+        await this.em.flush();
+        return pizzaIngredients;
+    }
+
+    async deletePizza(id: number): Promise<Pizza> {
         let pizza = await this.em.findOne(Pizza, { id });
         pizza.is_valid = false;
+        await this.deleteAllIngredientsFromPizza(pizza);
         this.em.persistAndFlush(pizza);
         return pizza;
     }
 
-    async addIngredientToPizza(pizza: Pizza, ingredient: Ingredient) {
+    async addIngredientToPizza(pizza: Pizza, ingredient: Ingredient): Promise<PizzaIngredients> {
         let pizzaIngredient = await this.em.findOne(PizzaIngredients, { pizza_id: pizza, ingredient_id: ingredient });
-        let order = await this.em.count(PizzaIngredients, { pizza_id: pizza });
+        let order = await this.em.count(PizzaIngredients, { pizza_id: pizza, is_valid: true });
 
         if (pizzaIngredient) {
             pizzaIngredient.is_valid = true;
             pizzaIngredient.order = order++;
             await this.em.persistAndFlush(pizzaIngredient);
+            await this.calcPizzaPrice(pizza);
             return pizzaIngredient;
         }
 
@@ -105,14 +117,50 @@ export class PizzaService {
         return pizzaIngredient;
     }
 
-    async removeIngredientFromPizza(pizza: Pizza, ingredient: Ingredient) {
+    async getIngredientsBefore(pizza: Pizza, ingredient: Ingredient): Promise<Ingredient[]> {
+        const pizzaIngredient = await this.em.findOne(PizzaIngredients, { pizza_id: pizza, ingredient_id: ingredient });
+        const pizzaIngredients = await this.em.find(PizzaIngredients, { pizza_id: pizza, is_valid: true, order: { $lte: pizzaIngredient.order } });
+        const ingredients: Ingredient[] = [];                
+
+        for (let pizzaIngredient of pizzaIngredients) {
+            ingredients.push(await this.em.findOne(Ingredient, pizzaIngredient.ingredient_id));
+        }
+
+
+        return ingredients;
+    }
+
+    async getIngredientsAfter(pizza: Pizza, ingredient: Ingredient): Promise<Ingredient[]> {
+        const pizzaIngredient = await this.em.findOne(PizzaIngredients, { pizza_id: pizza, ingredient_id: ingredient });
+        const pizzaIngredients = await this.em.find(PizzaIngredients, { pizza_id: pizza, is_valid: true, order: { $gt: pizzaIngredient.order } });
+        const ingredients: Ingredient[] = [];
+
+        for (let pizzaIngredient of pizzaIngredients) {
+            ingredients.push(await this.em.findOne(Ingredient, pizzaIngredient.ingredient_id));
+        }
+
+        return ingredients;
+    }
+
+    async clearIngredients(pizza: Pizza): Promise<PizzaIngredients[]> {
+        const pizzaIngredients = await this.em.find(PizzaIngredients, { pizza_id: pizza, is_valid: true });
+
+        for (let pizzaIngredient of pizzaIngredients) {
+            pizzaIngredient.is_valid = false;
+        }
+
+        await this.em.flush();
+        return pizzaIngredients;
+    }
+
+    async removeIngredientFromPizza(pizza: Pizza, ingredient: Ingredient): Promise<PizzaIngredients> {
         const pizzaIngredient = await this.em.findOne(PizzaIngredients, { pizza_id: pizza, ingredient_id: ingredient });
         pizzaIngredient.is_valid = false;
         await this.em.persistAndFlush(pizzaIngredient);
         return pizzaIngredient;
     }
 
-    async deleteIngredientFromPizza(pizza: Pizza, ingredient: Ingredient) {
+    async deleteIngredientFromPizza(pizza: Pizza, ingredient: Ingredient): Promise<PizzaIngredients> {
         const pizzaIngredient = await this.em.findOne(PizzaIngredients, { pizza_id: pizza, ingredient_id: ingredient });
         pizzaIngredient.is_valid = false;
         await this.em.flush();
